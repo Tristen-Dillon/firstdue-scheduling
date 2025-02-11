@@ -7,20 +7,23 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
-import { Users } from './collections/Users'
+import { Clients } from './collections/Clients'
 import { Media } from './collections/Media'
+import { Admins } from './collections/Admins'
+import { resendAdapter } from '@payloadcms/email-resend'
+import { Events } from './collections/Events'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
   admin: {
-    user: Users.slug,
+    user: Admins.slug,
     importMap: {
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  collections: [Clients, Media, Admins, Events],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -30,6 +33,11 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
+  }),
+  email: resendAdapter({
+    defaultFromAddress: 'tristendillon24@outlook.com',
+    defaultFromName: 'Tristen Dillon',
+    apiKey: process.env.RESEND_API_KEY!,
   }),
   sharp,
   plugins: [
