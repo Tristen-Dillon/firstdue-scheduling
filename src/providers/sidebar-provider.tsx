@@ -8,7 +8,7 @@ import {
   SidebarLink,
   SidebarLinkGroupLabels,
 } from '@/components/ui/sidebar'
-import { Home, Calendar, PanelRightClose, LogOut, User } from 'lucide-react'
+import { Home, Calendar, PanelRightClose, LogOut, User, Mail, Users } from 'lucide-react'
 import { cn, logout } from '@/lib/utils'
 import { useUser } from './user-provider'
 
@@ -30,9 +30,18 @@ if (!process.env.NEXT_PUBLIC_SITE_URL) {
   throw new Error('NEXT_PUBLIC_SITE_URL is not set')
 }
 
+type LinkGroup = {
+  label: string
+  links: {
+    label: string
+    href: string
+    icon: React.ReactNode
+  }[]
+}
+
 export default function SidebarProvider({ children }: SidebarProviderProps) {
   const { user } = useUser()
-  const linkGroups = [
+  const linkGroups: LinkGroup[] = [
     {
       label: 'Essentials',
       links: [
@@ -50,24 +59,50 @@ export default function SidebarProvider({ children }: SidebarProviderProps) {
         },
       ],
     },
-    {
+  ]
+
+  if (user.collection === 'admins') {
+    linkGroups.push({
+      label: 'Admin',
+      links: [
+        {
+          label: 'Manage Clients',
+          href: '/a/clients',
+          icon: <Users className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+        },
+        {
+          label: 'Manage Events',
+          href: '/a/events',
+          icon: (
+            <Calendar className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+          ),
+        },
+        {
+          label: 'Send Broadcast',
+          href: 'https://resend.com/broadcasts',
+          icon: <Mail className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+        },
+      ],
+    })
+  } else {
+    linkGroups.push({
       label: 'Customization',
       links: [
         {
           label: 'Profile',
-          href: '/profile',
+          href: '?modal=profile',
           icon: <User className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
         },
         {
           label: 'My Events',
-          href: '/my-events',
+          href: '/events',
           icon: (
             <Calendar className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
           ),
         },
       ],
-    },
-  ]
+    })
+  }
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -109,7 +144,7 @@ export default function SidebarProvider({ children }: SidebarProviderProps) {
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             <div className="mt-8 flex flex-col">
               <SidebarButton
-                className="mb-10 w-full"
+                className="mb-10 w-full hidden md:flex"
                 icon={
                   <PanelRightClose
                     className={`text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0 transition-all ${open ? 'rotate-180' : 'rotate-0'}`}

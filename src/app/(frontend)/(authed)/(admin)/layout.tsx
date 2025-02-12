@@ -9,8 +9,6 @@ import { UserProvider } from '@/providers/user-provider'
 import { headers } from 'next/headers'
 import config from '@/payload.config'
 import { redirect } from 'next/navigation'
-import SidebarProvider from '@/providers/sidebar-provider'
-import ProfileDialog from '@/components/profile-modal'
 
 export default async function AuthLayout(props: { children: React.ReactNode }) {
   const { children } = props
@@ -24,15 +22,9 @@ export default async function AuthLayout(props: { children: React.ReactNode }) {
     redirect('/login')
   }
 
-  return (
-    <UserProvider user={user as TypedUser}>
-      <div className="w-full h-full">
-        <SidebarProvider>
-          {children}
+  if (user.collection !== 'admins') {
+    redirect('/')
+  }
 
-          <ProfileDialog />
-        </SidebarProvider>
-      </div>
-    </UserProvider>
-  )
+  return children
 }

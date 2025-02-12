@@ -10,6 +10,9 @@ if (!process.env.RESEND_API_KEY || !process.env.NEXT_PUBLIC_RESEND_AUDIENCE_ID) 
 
 export const Clients: CollectionConfig = {
   slug: 'clients',
+  auth: {
+    maxLoginAttempts: 0,
+  },
   admin: {
     useAsTitle: 'fullName',
   },
@@ -19,7 +22,6 @@ export const Clients: CollectionConfig = {
     update: ClientOrAdmin,
     delete: AdminOnly,
   },
-  auth: true,
   fields: [
     {
       name: 'fullName',
@@ -75,7 +77,7 @@ export const Clients: CollectionConfig = {
         console.log('newDoc', newDoc)
         newDoc.fullName = `${newDoc.firstName} ${newDoc.lastName}`
         const shouldUpdateResend =
-          originalDoc.fullName !== newDoc.fullName || originalDoc.email !== newDoc.email
+          originalDoc?.fullName !== newDoc?.fullName || originalDoc?.email !== newDoc?.email
         const resend = new Resend(process.env.RESEND_API_KEY)
         if (shouldUpdateResend) {
           if (originalDoc?.contactId) {

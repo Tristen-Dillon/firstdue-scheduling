@@ -5,7 +5,9 @@ export const metadata = {
 }
 
 import './globals.css'
-import { ThemeProvider } from '../../providers/theme-provider'
+import { ThemeProvider } from '@/providers/theme-provider'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { Toaster } from 'sonner'
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
@@ -20,7 +22,10 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <NuqsAdapter>
+              {children}
+              <Toaster />
+            </NuqsAdapter>
           </ThemeProvider>
         </main>
       </body>

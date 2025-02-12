@@ -3,12 +3,15 @@
 import { createContext, useContext, useState } from 'react'
 import { Event as PayloadEvent } from '@/payload-types'
 import { addMonths, isSameDay, isSameMonth, subMonths } from 'date-fns'
+import { useQueryState } from 'nuqs'
+import { useUser } from './user-provider'
+import { motion } from 'framer-motion'
 interface CalendarContextType {
   state: {
     currentMonth: Date
     setCurrentMonth: React.Dispatch<React.SetStateAction<Date>>
-    selectedDate: Date | null
-    setSelectedDate: React.Dispatch<React.SetStateAction<Date | null>>
+    selectedDates: Date[]
+    setSelectedDates: React.Dispatch<React.SetStateAction<Date[]>>
     events: PayloadEvent[]
     setEvents: React.Dispatch<React.SetStateAction<PayloadEvent[]>>
   }
@@ -20,7 +23,10 @@ interface CalendarContextType {
     getEventsForMonth: (date: Date) => PayloadEvent[]
     nextMonth: () => void
     previousMonth: () => void
+    selectDate: (date: Date) => void
+    deselectDate: (date: Date) => void
   }
+  mode: 'view' | 'edit'
 }
 
 const CalendarContext = createContext<CalendarContextType | undefined>(undefined)
@@ -32,9 +38,12 @@ export function CalendarProvider({
   children: React.ReactNode
   events: PayloadEvent[]
 }) {
+  let mode
+  const { user } = useUser()
   const [currentMonth, setCurrentMonth] = useState(new Date())
+  const [view, setView] = useQueryState('view')
 
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [selectedDates, setSelectedDates] = useState<Date[]>([])
   const [eventState, setEventState] = useState<PayloadEvent[]>(events)
 
   const getEventsForDate = (date: Date) => {
@@ -69,14 +78,31 @@ export function CalendarProvider({
     setCurrentMonth(subMonths(currentMonth, 1))
   }
 
+  const selectDate = (date: Date) => {
+    setSelectedDates([...selectedDates, date])
+  }
+
+  const deselectDate = (date: Date) => {
+    setSelectedDates(selectedDates.filter((d) => !isSameDay(d, date)))
+  }
+
+  if (!view) {
+    mode = 'view'
+  }
+  if (view === 'edit' && user.collection === 'admins') {
+    mode = 'edit'
+  } else {
+    mode = 'view'
+  }
+
   return (
     <CalendarContext.Provider
       value={{
         state: {
           currentMonth,
           setCurrentMonth,
-          selectedDate,
-          setSelectedDate,
+          selectedDates,
+          setSelectedDates,
           events: eventState,
           setEvents: setEventState,
         },
@@ -88,10 +114,15 @@ export function CalendarProvider({
           getEventsForMonth,
           nextMonth,
           previousMonth,
+          selectDate,
+          deselectDate,
         },
+        mode: mode as 'view' | 'edit',
       }}
     >
-      {children}
+      <motion.div layout className="flex gap-2 h-full relative">
+        {children}
+      </motion.div>
     </CalendarContext.Provider>
   )
 }

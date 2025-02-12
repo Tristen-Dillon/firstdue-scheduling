@@ -5,6 +5,8 @@ export const Admins: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
   },
-  auth: true,
+  auth: {
+    maxLoginAttempts: 0,
+  },
   fields: [],
 }

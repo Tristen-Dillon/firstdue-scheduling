@@ -9,7 +9,7 @@ interface WeekProps {
 
 export default function Week({ startDate, currentMonth }: WeekProps) {
   return (
-    <div className="grid grid-cols-7 md:gap-1 h-full">
+    <div className="grid grid-cols-7 gap-1 h-full">
       {Array.from({ length: 7 }).map((_, i) => {
         const currentDate = addDays(startDate, i)
         return (

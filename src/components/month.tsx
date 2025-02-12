@@ -13,7 +13,7 @@ export default function Month() {
   const weeks = Array.from({ length: 6 }).map((_, i) => addWeeks(startDate, i))
 
   return (
-    <div className="w-full flex flex-col justify-between mx-auto bg-background shadow-lg rounded-lg md:gap-1 h-full">
+    <div className="w-full flex flex-col justify-between mx-auto bg-background shadow-lg rounded-lg gap-1 h-full">
       {weeks.map((weekStart, i) => (
         <Week key={i} startDate={weekStart} currentMonth={currentMonth} />
       ))}

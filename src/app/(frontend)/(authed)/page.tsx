@@ -1,11 +1,11 @@
 import { getPayload } from 'payload'
-import React from 'react'
+import React, { Suspense } from 'react'
 
 import config from '@/payload.config'
 import Calendar from '@/components/calendar'
-import { CalendarProvider } from '../../../providers/calendar-provider'
-import SidebarProvider from '../../../providers/sidebar-provider'
-
+import { CalendarProvider } from '@/providers/calendar-provider'
+import EventEditor from '@/components/event-editor'
+import EventsModal from '@/components/events-modal'
 export default async function HomePage() {
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
@@ -16,12 +16,12 @@ export default async function HomePage() {
   const events = eventsResults.docs
 
   return (
-    <div className="w-full h-full">
-      <SidebarProvider>
-        <CalendarProvider events={events}>
-          <Calendar />
-        </CalendarProvider>
-      </SidebarProvider>
-    </div>
+    <Suspense fallback={null}>
+      <CalendarProvider events={events}>
+        <Calendar />
+        <EventEditor />
+        <EventsModal />
+      </CalendarProvider>
+    </Suspense>
   )
 }
