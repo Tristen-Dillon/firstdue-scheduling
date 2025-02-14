@@ -12,6 +12,7 @@ export default async function HomePage() {
 
   const eventsResults = await payload.find({
     collection: 'events',
+    limit: 1000,
   })
   const events = eventsResults.docs
 

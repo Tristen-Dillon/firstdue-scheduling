@@ -79,7 +79,6 @@ export default function Day({ date, isCurrentMonth }: DayProps) {
         )}
       </div>
 
-      {/* Placeholder for events */}
     </div>
   )
 }

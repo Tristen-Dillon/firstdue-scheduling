@@ -98,7 +98,9 @@ export default function AddEventForm() {
               </FormItem>
             )}
           />
-          <Button type="submit">Add event</Button>
+          <Button disabled={form.formState.isLoading} type="submit">
+            Add event
+          </Button>
         </div>
       </form>
     </Form>

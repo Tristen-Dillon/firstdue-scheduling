@@ -53,15 +53,15 @@ export function CalendarProvider({
   }
 
   const addEvent = (event: PayloadEvent) => {
-    setEventState([...eventState, event])
+    setEventState((prev) => [...prev, event])
   }
 
   const deleteEvent = (event: PayloadEvent) => {
-    setEventState(eventState.filter((e) => e.id !== event.id))
+    setEventState((prev) => prev.filter((e) => e.id !== event.id))
   }
 
   const updateEvent = (event: PayloadEvent) => {
-    setEventState(eventState.map((e) => (e.id === event.id ? event : e)))
+    setEventState((prev) => prev.map((e) => (e.id === event.id ? event : e)))
   }
 
   const getEventsForMonth = (date: Date) => {
@@ -79,11 +79,11 @@ export function CalendarProvider({
   }
 
   const selectDate = (date: Date) => {
-    setSelectedDates([...selectedDates, date])
+    setSelectedDates((prev) => [...prev, date])
   }
 
   const deselectDate = (date: Date) => {
-    setSelectedDates(selectedDates.filter((d) => !isSameDay(d, date)))
+    setSelectedDates((prev) => prev.filter((d) => !isSameDay(d, date)))
   }
 
   if (!view) {
