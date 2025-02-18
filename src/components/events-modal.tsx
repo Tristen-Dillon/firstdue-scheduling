@@ -31,7 +31,6 @@ export default function EventsModal() {
   const [date, setDate] = useQueryState('date')
   const { functions, state } = useCalendar()
   const [selectedEvent, setSelectedEvent] = useState<PayloadEvent | null>()
-  const { user } = useUser()
 
   const [loading, setLoading] = useState(false)
   if (!modal || modal !== 'events') return null
@@ -104,14 +103,12 @@ export default function EventsModal() {
                 ))}
               </SelectContent>
             </Select>
-            {selectedEvent && (
-              <EventDetails
-                event={selectedEvent}
-                selectEvent={selectEvent}
-                deselectEvent={deselectEvent}
-                loading={loading}
-              />
-            )}
+            <EventDetails
+              event={selectedEvent}
+              selectEvent={selectEvent}
+              deselectEvent={deselectEvent}
+              loading={loading}
+            />
           </div>
         ) : (
           <EventDetails
@@ -132,13 +129,13 @@ function EventDetails({
   deselectEvent,
   loading,
 }: {
-  event: PayloadEvent
+  event: PayloadEvent | null | undefined
   selectEvent: (event: PayloadEvent) => void
   deselectEvent: (event: PayloadEvent) => void
   loading: boolean
 }) {
   const { user } = useUser()
-  console.log(event)
+  if (!event) return null
   return (
     <>
       <DialogDescription>

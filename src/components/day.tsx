@@ -4,6 +4,7 @@ import { useCalendar } from '@/providers/calendar-provider'
 import { Edit2 } from 'lucide-react'
 import { useUser } from '@/providers/user-provider'
 import Link from 'next/link'
+import ConditionalWrapper from './conditional-wrapper'
 interface DayProps {
   date: Date
   isCurrentMonth: boolean
@@ -52,24 +53,32 @@ export default function Day({ date, isCurrentMonth }: DayProps) {
         {events
           .sort((a, b) => a.startTime - b.startTime)
           .map((event) => (
-            <Link
+            <ConditionalWrapper
+              condition={mode === 'view'}
+              wrapper={(children) => <Link href={`/?modal=events&id=${event.id}`}>{children}</Link>}
               key={event.id}
-              href={`/?modal=events&id=${event.id}`}
-              className={`relative z-50 w-full min-h-6 rounded-md bg-red-800  items-center ${event.filled ? 'grayscale' : 'cursor-pointer'} `}
             >
-              <div className="w-2 rounded-l-md left-0 absolute h-full bg-red-600" />
-              <div className="ml-4 flex text-xs gap-2 items-center h-full text-nowrap truncate">
-                {format(new Date(event.startTime), 'h:mm a')} -{' '}
-                {format(new Date(event.endTime), 'h:mm a')}
-                <div className="text-xs hidden lg:block font-semibold truncate w-[80px]">
-                  {event.title}
+              <div
+                className={`relative z-50 w-full h-6 rounded-md bg-red-800  items-center ${event.filled ? 'grayscale' : ''} `}
+              >
+                <div className="w-2 rounded-l-md left-0 absolute h-full bg-red-600" />
+                <div className="ml-4 flex text-xs gap-2 items-center h-full text-nowrap truncate">
+                  {format(new Date(event.startTime), 'h:mm a')} -{' '}
+                  {format(new Date(event.endTime), 'h:mm a')}
+                  <div className="text-xs hidden lg:block font-semibold truncate w-[80px]">
+                    {event.title}
+                  </div>
                 </div>
               </div>
-            </Link>
+            </ConditionalWrapper>
           ))}
       </div>
-      <div className="w-full h-full block md:hidden mt-6 flex-col gap-2">
-        {events.length > 0 && (
+      <div
+        className={`absolute z-50 top-0 left-0 w-full h-full md:hidden ${
+          events.length > 0 ? 'bg-red-800/10' : ''
+        } ${events.every((e) => e.filled) ? 'grayscale' : ''}`}
+      >
+        {events.length > 0 && mode == 'view' && (
           <Link
             href={`?modal=events&date=${format(date, 'yyyy-MM-dd:hh:mm:ss')}`}
             className={`absolute z-50 top-0 left-0 w-full h-full bg-red-800/10 rounded-lg ${
@@ -78,7 +87,6 @@ export default function Day({ date, isCurrentMonth }: DayProps) {
           />
         )}
       </div>
-
     </div>
   )
 }

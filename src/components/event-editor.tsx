@@ -3,10 +3,9 @@
 import { useCalendar } from '@/providers/calendar-provider'
 import React, { useState } from 'react'
 import { Button } from './ui/button'
-import { Plus, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { motion } from 'framer-motion'
 import AddEventForm from './add-event-form'
-import useDebounce from '@/hooks/use-debounce'
 
 export default function EventEditor() {
   const { mode, state } = useCalendar()
@@ -56,10 +55,6 @@ function DesktopEventEditor() {
 }
 
 function MobileEventEditor() {
-  const {
-    state: { selectedDates, setSelectedDates },
-  } = useCalendar()
-
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -69,7 +64,7 @@ function MobileEventEditor() {
         className="md:hidden absolute top-12 right-4"
         onClick={() => setIsOpen(true)}
       >
-        Edit Selected
+        Edit
       </Button>
       {isOpen && (
         <div className="absolute top-0 left-0 w-full h-full rounded-md z-50 flex md:hidden bg-background border-border border">

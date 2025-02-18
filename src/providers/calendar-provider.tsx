@@ -41,7 +41,7 @@ export function CalendarProvider({
   let mode
   const { user } = useUser()
   const [currentMonth, setCurrentMonth] = useState(new Date())
-  const [view, setView] = useQueryState('view')
+  const [view, _] = useQueryState('view')
 
   const [selectedDates, setSelectedDates] = useState<Date[]>([])
   const [eventState, setEventState] = useState<PayloadEvent[]>(events)

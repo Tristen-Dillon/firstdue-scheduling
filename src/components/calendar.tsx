@@ -30,19 +30,27 @@ export default function Calendar() {
             {format(currentMonth, 'MMMM yyyy')}
           </h2>
           {user.collection === 'admins' && (
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (mode === 'view') {
-                  router.push('?view=edit')
-                } else {
-                  setSelectedDates([])
-                  router.push('/')
-                }
-              }}
-            >
-              {mode === 'view' ? 'Edit Calendar' : 'View Calendar'}
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (mode === 'view') {
+                    router.push('?view=edit')
+                  } else {
+                    setSelectedDates([])
+                    router.push('/')
+                  }
+                }}
+              >
+                {mode === 'view' ? 'Edit Events' : 'View Calendar'}
+              </Button>
+              {mode === 'edit' && (
+                <p className="text-sm text-muted-foreground">
+                  Click on a day to add an event. Click on the pencil icon to edit the events for a
+                  day.
+                </p>
+              )}
+            </>
           )}
         </div>
         <Button variant="outline" className="block md:hidden" onClick={nextMonth}>
