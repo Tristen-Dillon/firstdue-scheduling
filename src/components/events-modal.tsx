@@ -138,6 +138,7 @@ function EventDetails({
   loading: boolean
 }) {
   const { user } = useUser()
+  console.log(event)
   return (
     <>
       <DialogDescription>
