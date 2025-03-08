@@ -38,7 +38,7 @@ export default function Day({ date, isCurrentMonth }: DayProps) {
         <div className="absolute top-0 left-0 w-full h-full bg-blue-400/10 rounded-lg" />
       )}
       <span className="absolute top-2 left-2 text-xs font-semibold">{format(date, 'd')}</span>
-      <div className="w-full mt-6 hidden md:flex flex-col z-20 gap-2 overflow-y-auto h-32 scroll-container">
+      <div className="w-full mt-6 hidden md:flex flex-col z-20 gap-2 overflow-y-auto max-h-[136px] scroll-container">
         {events
           .sort((a, b) => a.startTime - b.startTime)
           .map((event) => (
@@ -66,7 +66,7 @@ export default function Day({ date, isCurrentMonth }: DayProps) {
           ))}
       </div>
       <div
-        className="z-10 absolute top-0 left-0 w-full h-full"
+        className="absolute inset-0 w-full h-full"
         onClick={() => {
           if (isSelected) {
             deselectDate(date)
