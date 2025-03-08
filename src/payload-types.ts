@@ -50,20 +50,19 @@ export interface Config {
 }
 export interface ClientAuthOperations {
   forgotPassword: {
-    email: string;
-    password: string;
+    username: string;
   };
   login: {
-    email: string;
     password: string;
+    username: string;
   };
   registerFirstUser: {
-    email: string;
     password: string;
+    username: string;
+    email: string;
   };
   unlock: {
-    email: string;
-    password: string;
+    username: string;
   };
 }
 export interface AdminAuthOperations {
@@ -100,6 +99,7 @@ export interface Client {
   updatedAt: string;
   createdAt: string;
   email: string;
+  username: string;
   resetPasswordToken?: string | null;
   resetPasswordExpiration?: string | null;
   salt?: string | null;
@@ -245,6 +245,7 @@ export interface ClientsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   email?: T;
+  username?: T;
   resetPasswordToken?: T;
   resetPasswordExpiration?: T;
   salt?: T;

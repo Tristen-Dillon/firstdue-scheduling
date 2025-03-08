@@ -19,8 +19,8 @@ import {
 } from '@/components/ui/form'
 
 const formSchema = z.object({
-  email: z.string().email({
-    message: 'Invalid email address',
+  username: z.string().min(1, {
+    message: 'Username is required',
   }),
   password: z.string().min(1, {
     message: 'Password is required',
@@ -32,17 +32,17 @@ export function LoginForm({ className }: React.ComponentPropsWithoutRef<'form'>)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
+      username: '',
       password: '',
     },
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { email, password } = values
+    const { username, password } = values
     try {
       const clientResponse = await fetch('/api/clients/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -53,7 +53,7 @@ export function LoginForm({ className }: React.ComponentPropsWithoutRef<'form'>)
       }
       const adminResponse = await fetch('/api/admins/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: username, password }),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -64,7 +64,7 @@ export function LoginForm({ className }: React.ComponentPropsWithoutRef<'form'>)
       }
       if (!clientResponse.ok && !adminResponse.ok) {
         form.setError('password', {
-          message: 'Invalid email or password',
+          message: 'Invalid username or password',
         })
       }
     } catch (error) {
@@ -78,19 +78,19 @@ export function LoginForm({ className }: React.ComponentPropsWithoutRef<'form'>)
         <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-2xl font-bold">Login to your account</h1>
           <p className="text-balance text-sm text-muted-foreground">
-            Enter your email below to login to your account
+            Enter your username below to login to your account
           </p>
         </div>
         <div className="grid gap-6">
           {/* <div className="grid gap-2"> */}
           <FormField
             control={form.control}
-            name="email"
+            name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input placeholder="john.doe@gmail.com" {...field} />
+                  <Input placeholder="john.doe" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

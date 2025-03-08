@@ -23,17 +23,6 @@ export default function Day({ date, isCurrentMonth }: DayProps) {
   const events = getEventsForDate(date)
   return (
     <div
-      onClick={() => {
-        if (isSelected) {
-          deselectDate(date)
-        } else {
-          if (mode === 'view') {
-            setSelectedDates([date])
-          } else {
-            selectDate(date)
-          }
-        }
-      }}
       className={`relative border border-border p-2 min-h-12 h-full grow flex flex-col items-start text-sm rounded-lg ${
         isCurrentMonth ? 'bg-accent text-foreground' : 'bg-background-90 text-muted-foreground'
       }`}
@@ -49,13 +38,16 @@ export default function Day({ date, isCurrentMonth }: DayProps) {
         <div className="absolute top-0 left-0 w-full h-full bg-blue-400/10 rounded-lg" />
       )}
       <span className="absolute top-2 left-2 text-xs font-semibold">{format(date, 'd')}</span>
-      <div className="w-full h-full mt-6 hidden md:flex flex-col gap-2">
+      <div className="w-full mt-6 hidden md:flex flex-col z-20 gap-2 overflow-y-auto h-32 scroll-container">
         {events
           .sort((a, b) => a.startTime - b.startTime)
           .map((event) => (
             <ConditionalWrapper
               condition={mode === 'view'}
               wrapper={(children) => <Link href={`/?modal=events&id=${event.id}`}>{children}</Link>}
+              elseWrapper={(children) => (
+                <Link href={`/a/events?query='id=${event.id}'`}>{children}</Link>
+              )}
               key={event.id}
             >
               <div
@@ -73,6 +65,20 @@ export default function Day({ date, isCurrentMonth }: DayProps) {
             </ConditionalWrapper>
           ))}
       </div>
+      <div
+        className="z-10 absolute top-0 left-0 w-full h-full"
+        onClick={() => {
+          if (isSelected) {
+            deselectDate(date)
+          } else {
+            if (mode === 'view') {
+              setSelectedDates([date])
+            } else {
+              selectDate(date)
+            }
+          }
+        }}
+      />
       <div
         className={`absolute z-50 top-0 left-0 w-full h-full md:hidden ${
           events.length > 0 ? 'bg-red-800/10' : ''

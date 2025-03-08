@@ -1,8 +1,9 @@
 import { AdminOnly } from '@/access/AdminOnly'
 import { ClientOrAdmin } from '@/access/ClientOrAdmin'
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, PayloadRequest } from 'payload'
 import type { Client } from '@/payload-types'
 import { Resend } from 'resend'
+import crypto from 'crypto'
 
 if (!process.env.RESEND_API_KEY || !process.env.NEXT_PUBLIC_RESEND_AUDIENCE_ID) {
   throw new Error('RESEND_API_KEY and NEXT_PUBLIC_RESEND_AUDIENCE_ID must be set')
@@ -11,10 +12,14 @@ if (!process.env.RESEND_API_KEY || !process.env.NEXT_PUBLIC_RESEND_AUDIENCE_ID) 
 export const Clients: CollectionConfig = {
   slug: 'clients',
   auth: {
+    loginWithUsername: {
+      allowEmailLogin: false,
+      requireEmail: true,
+    },
     maxLoginAttempts: 0,
   },
   admin: {
-    useAsTitle: 'fullName',
+    useAsTitle: 'email',
   },
   access: {
     read: ClientOrAdmin,
@@ -23,6 +28,16 @@ export const Clients: CollectionConfig = {
     delete: AdminOnly,
   },
   fields: [
+    {
+      name: 'username',
+      type: 'text',
+      required: true,
+    },
+    {
+      name: 'email',
+      type: 'email',
+      required: true,
+    },
     {
       name: 'fullName',
       type: 'text',
@@ -41,11 +56,6 @@ export const Clients: CollectionConfig = {
       required: true,
     },
     {
-      name: 'email',
-      type: 'email',
-      required: true,
-    },
-    {
       name: 'phone',
       type: 'text',
       required: true,
@@ -59,6 +69,14 @@ export const Clients: CollectionConfig = {
       name: 'contactId',
       type: 'text',
       required: false,
+      access: {
+        create: ({ req }) => {
+          return req.user?.collection === 'admins'
+        },
+        update: ({ req }) => {
+          return req.user?.collection === 'admins'
+        },
+      },
     },
     {
       name: 'subscribed',
@@ -73,8 +91,6 @@ export const Clients: CollectionConfig = {
         if (context.ignoreBeforeChange) {
           return newDoc
         }
-        console.log('originalDoc', originalDoc)
-        console.log('newDoc', newDoc)
         newDoc.fullName = `${newDoc.firstName} ${newDoc.lastName}`
         const shouldUpdateResend =
           originalDoc?.fullName !== newDoc?.fullName || originalDoc?.email !== newDoc?.email
@@ -129,6 +145,9 @@ export const Clients: CollectionConfig = {
           if (contact.data) {
             doc.contactId = contact.data.id
           }
+          if (doc.firstName && doc.lastName) {
+            doc.fullName = `${doc.firstName} ${doc.lastName}`
+          }
           setTimeout(async () => {
             await req.payload.update({
               collection: 'clients',
@@ -153,4 +172,40 @@ export const Clients: CollectionConfig = {
       },
     ],
   },
+  endpoints: [
+    {
+      path: '/new',
+      method: 'post',
+      handler: async (req: PayloadRequest) => {
+        const user = req.user
+        const body = await req.json?.()
+
+        if (!user || user.collection !== 'admins') {
+          return new Response('Unauthorized', { status: 401 })
+        }
+
+        const { username, email, firstName, lastName, phone, address, subscribed } = body
+        const hash = crypto.createHash('sha256')
+        hash.update(process.env.PAYLOAD_SECRET + username)
+        const password = hash.digest('hex').substring(0, 12)
+        const client = await req.payload.create({
+          collection: 'clients',
+          data: {
+            username,
+            email,
+            firstName,
+            lastName,
+            phone,
+            address,
+            subscribed,
+            password: password,
+          },
+          context: {
+            ignoreBeforeChange: true,
+          },
+        })
+        return new Response(JSON.stringify(client), { status: 200 })
+      },
+    },
+  ],
 }

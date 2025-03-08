@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import React from 'react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Form, FormField, FormItem, FormLabel, FormControl } from './ui/form'
@@ -17,7 +17,8 @@ const formSchema = z.object({
   endTime: z.date(),
 })
 
-export default function AddEventForm() {
+export default function EventForm() {
+  const [isLoading, setIsLoading] = useState(false)
   const { state, functions } = useCalendar()
   const { selectedDates } = state
   const { addEvent } = functions
@@ -31,7 +32,8 @@ export default function AddEventForm() {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    for (const date of selectedDates) {
+    setIsLoading(true)
+    for (const date of selectedDates.sort((a, b) => a.getTime() - b.getTime())) {
       const res = await fetch('/api/events', {
         method: 'POST',
         body: JSON.stringify({
@@ -49,13 +51,14 @@ export default function AddEventForm() {
       if (!res.ok) {
         console.error('Failed to add event')
         toast.error('Failed to add event')
-        return
+        continue
       }
       const data = await res.json()
       console.log(data)
       addEvent(data.doc)
     }
     toast.success('Events added')
+    setIsLoading(false)
   }
 
   return (
@@ -98,7 +101,7 @@ export default function AddEventForm() {
               </FormItem>
             )}
           />
-          <Button disabled={form.formState.isLoading} type="submit">
+          <Button disabled={isLoading} type="submit">
             Add event
           </Button>
         </div>

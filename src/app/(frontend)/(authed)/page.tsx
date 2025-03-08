@@ -6,6 +6,7 @@ import Calendar from '@/components/calendar'
 import { CalendarProvider } from '@/providers/calendar-provider'
 import EventEditor from '@/components/event-editor'
 import EventsModal from '@/components/events-modal'
+
 export default async function HomePage() {
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
